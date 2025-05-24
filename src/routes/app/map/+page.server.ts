@@ -1,11 +1,14 @@
 import { findAllTreesMap } from "$lib/server/db/colTrees";
-import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
-    return {
-        trees: await findAllTreesMap(),
-    };
-};
+export async function load() {
+  const allTrees = await findAllTreesMap();
+  const half = Math.ceil(allTrees.length / 1);
+  const halfTrees = allTrees.slice(0, half);
+
+  return {
+    trees: halfTrees
+  };
+}
 
 // src/routes/app/map/+page.server.ts
 // import rawTrees from "$lib/data/tree.json";

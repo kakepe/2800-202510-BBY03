@@ -1,27 +1,22 @@
-import type { ReplaceType } from "$lib";
-import type { TreeSpeciesGuideDocument } from "$lib/server/db";
-import { getGuidesCollection } from "$lib/server/db/colGuides";
-import type { ObjectId, WithId } from "mongodb";
-import type { PageServerLoad } from "./$types";
+import { readdir } from 'fs/promises';
+import path from 'path';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-    const guides = await getGuidesCollection().then((guides) => {
-        return guides
-            .aggregate<ReplaceType<WithId<TreeSpeciesGuideDocument>, ObjectId, string>>([
-                {
-                    $match: { treeSpeciesId: { $exists: true } },
-                },
-                {
-                    $addFields: {
-                        _id: { $toString: "$_id" },
-                        treeSpeciesId: { $toString: "$treeSpeciesId" },
-                    },
-                },
-            ])
-            .toArray();
-    });
+  try {
+    const guidesDir = path.resolve('static/guides');
+    const files = await readdir(guidesDir);
 
-    return {
-        guides,
-    };
+    const htmlFiles = files.filter(file => file.endsWith('.html'));
+
+    const guides = htmlFiles.map(file => ({
+      name: file.replace(/_/g, ' ').replace(/\.html$/, ''),
+      path: `/guides/${file}`
+    }));
+
+    return { guides };
+  } catch (err) {
+    console.error('Error loading guide files:', err);
+    return { guides: [] };
+  }
 };

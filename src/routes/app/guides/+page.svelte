@@ -1,20 +1,23 @@
 <script lang="ts">
-    let { data } = $props();
+  export let data;
 </script>
 
-{#snippet guideCard(id: string, title: string, dateCreated: Date)}
-    <a href="/app/guides/species/{id}">
-        <div class="p-3 rounded border">
-            <h3 class="text-xl font-bold">{title}</h3>
-            <p>Posted in {dateCreated.toLocaleString()}</p>
-        </div>
-    </a>
-{/snippet}
+<div class="p-8 text-center bg-orange-50 min-h-screen">
+  <h1 class="text-4xl font-bold mb-8">
+    🌳 Vancouver Trees Guide 🌳
+  </h1>
 
-<div class="max-w-xl mx-auto p-edge-d *:not-last:mb-6">
-    <h1 class="text-3xl font-bold">Guides</h1>
-
-    {#each data.guides as guide}
-        {@render guideCard(guide._id, guide.title, guide.dateCreated)}
-    {/each}
+  {#if data.guides.length > 0}
+    <ul class="space-y-4 max-w-xl mx-auto">
+      {#each data.guides as guide}
+        <li class="bg-white p-4 rounded-lg shadow hover:shadow-md transition">
+          <a href={guide.path} class="text-lg font-semibold text-orange-700 hover:text-orange-900 underline">
+            {guide.name}
+          </a>
+        </li>
+      {/each}
+    </ul>
+  {:else}
+    <p class="text-gray-600">No guides found.</p>
+  {/if}
 </div>
